@@ -1,0 +1,184 @@
+﻿<Window x:Class="project_house.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:project_house"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="500" Width="800" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowState="Maximized">
+    <Window.Resources>
+        <sys:Double x:Key="Buttons_text_size">18</sys:Double>
+        <Style x:Key="Panel_border">
+            <Setter Property="Control.BorderBrush" Value="#FF707070" />
+            <Setter Property="Control.BorderThickness" Value="2" />
+            <Setter Property="Control.Margin" Value="2"/>
+        </Style>
+        <Style x:Key="Buttons">
+            <Setter Property="Control.BorderBrush" Value="#FF707070" />
+            <Setter Property="Control.BorderThickness" Value="2" />
+            <Setter Property="Control.Background" Value="White"/>
+            <Setter Property="Control.FontFamily" Value="Comic Sans MS"/>
+            <Setter Property="Control.FontSize" Value="{DynamicResource Buttons_text_size}"/>
+            <Setter Property="Control.VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Control.HorizontalContentAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Name="Main_grid" Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="3*"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Border Name="MyCanvasBorder" Grid.ColumnSpan="2" Style="{StaticResource Panel_border}" Margin="0,0,5,5">
+            <Canvas Name="MyCanvas" Background="White" MouseEnter="MyCanvas_MouseEnter" MouseLeave="MyCanvas_MouseLeave" MouseRightButtonDown="MyCanvas_MouseRightButtonDown">
+                
+            </Canvas>
+        </Border>
+        <Grid Name="Panel_object_groups" Grid.Column="2" Margin="5,0,0,5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="7*"/>
+                <RowDefinition Height="2*"/>
+            </Grid.RowDefinitions>
+            <Label Name="object_groups_lbl" Style="{StaticResource Buttons}" Content="Object groups" Padding="0,0,0,0"></Label>
+            <Border BorderThickness="2,0,2,0" BorderBrush="#FF707070" Grid.Row="1">
+            <StackPanel Name="groups_panel"  DockPanel.Dock="Top" MinHeight="210">
+
+            </StackPanel>
+            </Border>
+            <Grid Name="object_groups_btn_panel" Grid.Row="2" DockPanel.Dock="Bottom" MinHeight="48">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button  Name="btnSaveGroup" Grid.Column="0" Style="{StaticResource Buttons}"  BorderThickness="2,2,0,2"  Padding="0,0,0,0">
+                    <TextBlock>
+                        Save <LineBreak/>
+                        group
+                    </TextBlock>
+                </Button>
+                <Button  Name="btnDegroup" Grid.Column="1" Style="{StaticResource Buttons}"  BorderThickness="2,2,0,2"  Padding="0,0,0,0">
+                    <TextBlock>
+                        Split <LineBreak/>
+                        group
+                    </TextBlock>
+                </Button>
+                <Button Name="btnLoadGroup" Grid.Column="2" Style="{StaticResource Buttons}"  BorderThickness="2,2,2,2" Padding="0,0,0,0">
+                <TextBlock>
+                        Load <LineBreak/>
+                        group
+                </TextBlock>
+                </Button>
+            </Grid>
+        </Grid>
+        <Border Name="Panel_furniture_border" Grid.Row="1" Style="{StaticResource Panel_border}" Margin="0,5,5,0">
+            <DockPanel Name="Panel_objects" >
+                <Grid Name="object_panel_btns" DockPanel.Dock="Left" MinWidth="120">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Button Name="building_btn" Style="{StaticResource Buttons}" Content="Building mode" BorderThickness="0,0,2,2" Click="building_btn_Click"/>
+                    <Button Name="furniture_btn" Grid.Row="1" Style="{StaticResource Buttons}" BorderThickness="0,0,2,0" Click="furniture_btn_Click">
+                        <Button.Content>
+                            <TextBlock VerticalAlignment="Stretch">
+                                Furniture <LineBreak/>
+                                placement
+                            </TextBlock>
+                        </Button.Content>
+                    </Button>
+                </Grid>
+                <Grid Name="furniture_objects" DockPanel.Dock="Left" MinWidth="100">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="8*"/>
+                        <RowDefinition Height="2.5*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <ListBox HorizontalContentAlignment="Stretch" BorderThickness="0" Grid.ColumnSpan="4" VerticalContentAlignment="Stretch" ItemsSource="{Binding Images}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border>
+                                    <Image Source="{Binding Path}" Style="{StaticResource ImageStyle}" />
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="4">
+                                </UniformGrid>
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+
+                        <ListBoxItem Name="furniture_item_chair" BorderThickness="0">
+                            <Button x:Name="btnImage1" Background="Transparent" BorderThickness="0" Click="btnImage1_Click">
+                                <Image Name="furniture_btn_image_1" Source="concept/corner.png"/>
+                            </Button>
+                        </ListBoxItem>
+                        <ListBoxItem Name="furniture_item_table" BorderThickness="0">
+                            <Button x:Name="btnImage2" Background="Transparent" BorderThickness="0" Click="btnImage2_Click">
+                                <Image Name="furniture_btn_image_2" Source="concept/wall.png"/>
+                            </Button>
+                        </ListBoxItem>
+                        <ListBoxItem Name="furniture_item_sofa" BorderThickness="0">
+                            <Button x:Name="btnImage3" Background="Transparent" BorderThickness="0" Click="btnImage3_Click">
+                                <Image Name="furniture_btn_image_3" Source="concept/door.png"/>
+                            </Button>
+                        </ListBoxItem>
+                        <ListBoxItem Name="furniture_item_bed" BorderThickness="0">
+                            <Button x:Name="btnImage4" Background="Transparent" BorderThickness="0" Click="btnImage4_Click">
+                                <Image Name="furniture_btn_image_4" Source="concept/window.png"/>
+                            </Button>
+                        </ListBoxItem>
+                    </ListBox>
+                    <Label  x:Name="furniture_objects_txt_box_1" Grid.Row="1" Style="{StaticResource Buttons}"  BorderThickness="0" Content="corner" Padding="0"/>
+                    <Label  x:Name="furniture_objects_txt_box_2" Grid.Row="1" Grid.Column="1" Style="{StaticResource Buttons}"  BorderThickness="0" Content="wall" Padding="0"/>
+                    <Label  x:Name="furniture_objects_txt_box_3" Grid.Row="1" Grid.Column="2" Style="{StaticResource Buttons}"  BorderThickness="0" Content="door" Padding="0"/>
+                    <Label  x:Name="furniture_objects_txt_box_4" Grid.Row="1" Grid.Column="3" Style="{StaticResource Buttons}"  BorderThickness="0" Content="window" Padding="0"/>
+                </Grid>
+            </DockPanel>
+        </Border>
+        <Grid  Name="Panel_tools" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" Margin="5,5,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.9*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="0.9*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Button Style="{StaticResource Buttons}" BorderThickness="2,2,0,0"  Name="btnSaveLoadProject" Grid.Row="0" Grid.RowSpan="2">
+                <TextBlock>
+                    Save/load <LineBreak/>
+                    project            
+                </TextBlock>
+            </Button>
+            <Button  BorderThickness="2,2,0,2" Name="btnTurnLeft"  Grid.Row="2" >
+                <Image Source="concept/arrow_left.jpg" Stretch="Fill" Visibility="Visible"/>
+            </Button>
+            <Button BorderThickness="2,2,2,2"  Name="btnTurnRight" Grid.Row="2" Grid.Column="2">
+                <Image Source="concept/arrow_right.jpg" Stretch="Fill" Visibility="Visible"/>
+            </Button>
+            <Button Style="{StaticResource Buttons}" BorderThickness="2,2,0,0" Name="btnGroup" Content="Group" Grid.Row="0" Grid.Column="1"/>
+            <Button Style="{StaticResource Buttons}" BorderThickness="2,2,0,0" Name="btnCalculate" Content="Calculate" Grid.Row="1" Grid.Column="1"/>
+            <Button Style="{StaticResource Buttons}" BorderThickness="2,2,2,0" Name="Delete" Content="Delete" Grid.Column="2" Grid.RowSpan="2"/>
+            <Border Grid.Row="2" Grid.Column="1" Style="{StaticResource Buttons}" BorderThickness="2,2,0,2">
+                <Label Name="Turn" Content="Turn" Padding="5,1,5,5" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
