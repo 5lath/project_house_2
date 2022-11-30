@@ -60,6 +60,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Debug\CustomCursorLib.dll</HintPath>
     </Reference>
+    <Reference Include="CustomObjectsLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\CustomObjectsLib.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -146,22 +150,28 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="concept\chair.png" />
-    <Resource Include="concept\sofa.png" />
-    <Resource Include="concept\table.png" />
+    <Resource Include="resources\arrow_left.jpg" />
+    <Resource Include="resources\arrow_right.jpg" />
+    <Resource Include="resources\bed.png" />
+    <Resource Include="resources\chair.png" />
+    <Resource Include="resources\corner.png" />
+    <Resource Include="resources\door.png" />
+    <Resource Include="resources\sofa.png" />
+    <Resource Include="resources\table.png" />
+    <Resource Include="resources\wall.png" />
+    <Resource Include="resources\window.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="concept\bed.png" />
+    <Resource Include="resources\chair220.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="concept\corner.png" />
-    <Resource Include="concept\door.png" />
-    <Resource Include="concept\wall.png" />
-    <Resource Include="concept\window.png" />
+    <Resource Include="resources\table220.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="concept\arrow_left.jpg" />
-    <Resource Include="concept\arrow_right.jpg" />
+    <Resource Include="resources\sofa220.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="resources\bed220.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
