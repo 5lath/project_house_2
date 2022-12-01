@@ -12,7 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-//Мои библиотеки
+using System.Diagnostics;
+//наши библиотеки
 using CustomCursorLib;
 using CustomObjectsLib;
 
@@ -21,7 +22,7 @@ namespace project_house
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : System.Windows.Window
     {
         #region Поля класса
         CustomCursor customCursor;//кастомный курсор приложения
@@ -35,7 +36,8 @@ namespace project_house
         int typeOfTool = -1;//1 - стул/угол, 2 - стол/стена, 3 - диван/дверь, 4 - кровать/окно. Выборы
                             //по типу стул/угол зависят от значения isBuildingModeOn. Для значения true выбирается второй вариант из пары.
         int objectSize = 80;
-        int wallThicnkess = 20;
+        int wallThicnkess = 10;
+        public int isDoorWasSelected = -1;//-1 - ничего, 1 - дверь, 2 - окно
         #endregion
         #region String
         string nameOfCustomTool = "";//название выбранного в данный момент инструмента. Пишется по типу toolName.png (только .png!!!)
@@ -49,10 +51,10 @@ namespace project_house
         public MainWindow()
         {
             InitializeComponent();
-            LoadStartupParams();          
+            StartupSettingsAndParams();          
         }
         #region Параметры для запуска приложения
-        public void LoadStartupParams()//здесь устанавливаются параметры для запуска приложения
+        public void StartupSettingsAndParams()//здесь устанавливаются параметры для запуска приложения
         {
             this.Resources["Buttons_text_size"] = 35.0;
         }
@@ -264,6 +266,7 @@ namespace project_house
             }
             this.Cursor = customCursor.GetCustomCursor();
             isCustomCursorSelected = true;
+            isDoorWasSelected = 1;//дверь
         }
         //4)меняет дефолтный курсор на курсор окна или кровати, а так же
         private void btnImage4_Click(object sender, RoutedEventArgs e)
@@ -298,6 +301,7 @@ namespace project_house
                 nameOfCustomTool = "bed.png";
             }
             this.Cursor = customCursor.GetCustomCursor();
+            isDoorWasSelected = 2;//окно
             isCustomCursorSelected = true;
         }
         #endregion
@@ -307,12 +311,8 @@ namespace project_house
         {
             if (nameOfCustomTool != "" && nameOfCustomTool != null)
             {
-                if (nameOfCustomTool == "door.png" || nameOfCustomTool == "window.png")
-                {
-                    //установка двери/окна
-
-                }
-                else if (nameOfCustomTool != "wall.png")//movable object как мебель или угол
+                if (nameOfCustomTool != "wall.png" && nameOfCustomTool != "window.png"
+                    && nameOfCustomTool != "door.png")//movable object как мебель или угол
                 {
                     //размещать объект можно только в пределах канваса. если этого условия не будет, то можно поставить 
                     //курсор вплотную к верхней границе и разместить там объект, который выйдет за пределы канваса
@@ -369,13 +369,29 @@ namespace project_house
 
                 if (isBothUnitWasSelected)
                 {
-                    WallUnit wall = new WallUnit(MyCanvas, cornerUnitSelectedByWall_1, cornerUnitSelectedByWall_2, wallThicnkess);
-                    //находим индексы наших углов в списке MyCanvas.Children, что бы поработать напрямую с отображаемыми экземплярами
-                    int indexOfFirstCornerIncludedInThisWall = MyCanvas.Children.IndexOf(cornerUnitSelectedByWall_1);
-                    int indexOfSecondCornerIncludedInThisWall = MyCanvas.Children.IndexOf(cornerUnitSelectedByWall_2);
-                    //добавляем в список стен, в состав которых включены наши углы, новую стену
-                    ((CornerMovableUnit)MyCanvas.Children[indexOfFirstCornerIncludedInThisWall]).wallsIncludesThisCornerList.Add(wall);
-                    ((CornerMovableUnit)MyCanvas.Children[indexOfSecondCornerIncludedInThisWall]).wallsIncludesThisCornerList.Add(wall);
+                    bool isWallLikeThisExist = false;
+                    foreach(var wallU in MyCanvas.Children)
+                    {
+                        if (wallU is WallUnit)
+                        {
+                            if (((WallUnit)wallU).unit1 == cornerUnitSelectedByWall_1 && ((WallUnit)wallU).unit2 == cornerUnitSelectedByWall_2)
+                            {
+                                isWallLikeThisExist = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!isWallLikeThisExist)
+                    {
+                        WallUnit wall = new WallUnit(MyCanvas, cornerUnitSelectedByWall_1, cornerUnitSelectedByWall_2, wallThicnkess);
+                        wall.MouseLeftButtonDown += SetClipedObjectOnWall;
+                        //находим индексы наших углов в списке MyCanvas.Children, что бы поработать напрямую с отображаемыми экземплярами
+                        int indexOfFirstCornerIncludedInThisWall = MyCanvas.Children.IndexOf(cornerUnitSelectedByWall_1);
+                        int indexOfSecondCornerIncludedInThisWall = MyCanvas.Children.IndexOf(cornerUnitSelectedByWall_2);
+                        //добавляем в список стен, в состав которых включены наши углы, новую стену
+                        ((CornerMovableUnit)MyCanvas.Children[indexOfFirstCornerIncludedInThisWall]).wallsIncludesThisCornerList.Add(wall);
+                        ((CornerMovableUnit)MyCanvas.Children[indexOfSecondCornerIncludedInThisWall]).wallsIncludesThisCornerList.Add(wall);
+                    }
                     ExitTheWallBuildingMode();
                     ResetCustomCursorToDefault();//работа закончена, можно выйти из режима строительства стен
                 }
@@ -397,6 +413,7 @@ namespace project_house
         #region Сброс курсора
         //сброс курсор на дефолтный,
         //запрет ставить объекты на канвасе
+        //так же происходит сброс инструментов
         private void ResetCustomCursorToDefault()
         {
             if (isCustomCursorSelected)
@@ -406,6 +423,7 @@ namespace project_house
                 isCustomCursorSelected = false;
                 isObjectCanBePlacedOnCanvas = false;
                 nameOfCustomTool = "";
+                isDoorWasSelected = -1;
             }
         }
         //При нажатии правой кнопки мыши в любом месте экрана курсор будет сброшен на дефолтный
@@ -416,6 +434,27 @@ namespace project_house
             ExitTheWallBuildingMode();
             ResetCustomCursorToDefault();
         }
+
         #endregion
+
+        //здесь происходит установка дверей и окон! звоните по телефону SetClipedObjectOnWall!
+        private void SetClipedObjectOnWall(object sender, RoutedEventArgs e)
+        {
+            if(isDoorWasSelected == 1)//дверь
+            {
+                ((WallUnit)sender).SetClipedObjectOnThisWall("door.png");
+                ResetCustomCursorToDefault();
+            }
+            else if(isDoorWasSelected == 2)//окно
+            {
+                ((WallUnit)sender).SetClipedObjectOnThisWall("window.png");
+                ResetCustomCursorToDefault();
+            }
+        }
+        //вход/выход из режима удаления объектов
+        private void Delete_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
