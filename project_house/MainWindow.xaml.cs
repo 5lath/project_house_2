@@ -31,6 +31,8 @@ namespace project_house
         bool isCustomCursorSelected = false;//кастомный курсор выбран или дефолтный(Arrow и.т.д)
         bool isObjectCanBePlacedOnCanvas = false;//true-выбран какой-то инструмент, который
                                                  //может ставить объекты на канвасе по нажатию ЛКМ(пример: любая мебель)
+        public bool isDeleteModeON = false; //включен ли режим удаления. если да, то объекты, на которых
+        //юзер кликает левой кнопкой мыши будут удалены
         #endregion
         #region Int
         int typeOfTool = -1;//1 - стул/угол, 2 - стол/стена, 3 - диван/дверь, 4 - кровать/окно. Выборы
@@ -104,6 +106,7 @@ namespace project_house
         #endregion
         #region Установить movable на канвас
         private void SetMovableOnCanvas(string movableObjectName)
+
         {
             Point currentMousePos = Mouse.GetPosition(MyCanvas);//текущая позиция мыши => нижний левый угол объекта
             bool isCursorCrossSomething = false;
@@ -150,6 +153,10 @@ namespace project_house
         //1)меняет дефолтный курсор на курсор угла или стула,
         private void btnImage1_Click(object sender, RoutedEventArgs e)
         {
+            if (isDeleteModeON)//если включен режим удаления, то мы его выключаем (см функционал Delete_Click)
+            {
+                Delete_Click(sender, e);
+            }
             if (isBuildingModeOn)//режим строит-ва включен => угол
             {
                 if (isCustomCursorSelected)//значит мы переключились с другого элемента этой же категории,
@@ -192,6 +199,11 @@ namespace project_house
         //2)меняет дефолтный курсор на курсор стены или стола
         private void btnImage2_Click(object sender, RoutedEventArgs e)
         {
+            if(isDeleteModeON)//если включен режим удаления, то мы его выключаем (см функционал Delete_Click)
+            {
+                Delete_Click(sender,e);
+            }
+
             if (isBuildingModeOn)//режим строит-ва включен => wall
             {
                 if (isCustomCursorSelected)
@@ -235,6 +247,10 @@ namespace project_house
         //3)меняет дефолтный курсор на курсор двери или дивана
         private void btnImage3_Click(object sender, RoutedEventArgs e)
         {
+            if (isDeleteModeON)//если включен режим удаления, то мы его выключаем (см функционал Delete_Click)
+            {
+                Delete_Click(sender, e);
+            }
             if (isBuildingModeOn)//режим строит-ва включен => door
             {
                 if (isCustomCursorSelected)
@@ -271,6 +287,10 @@ namespace project_house
         //4)меняет дефолтный курсор на курсор окна или кровати, а так же
         private void btnImage4_Click(object sender, RoutedEventArgs e)
         {
+            if (isDeleteModeON)//если включен режим удаления, то мы его выключаем (см функционал Delete_Click)
+            {
+                Delete_Click(sender, e);
+            }
             if (isBuildingModeOn)//режим строит-ва включен => window
             {
                 if (isCustomCursorSelected)
@@ -320,6 +340,9 @@ namespace project_house
                         SetMovableOnCanvas(nameOfCustomTool);
                 }
             }
+            this.Cursor = customCursor.GetCustomCursor();
+            isCustomCursorSelected = true;
+            isDoorWasSelected = 1;//дверь
         }
         #endregion
         #region Режим строительства стен
@@ -425,6 +448,9 @@ namespace project_house
                 nameOfCustomTool = "";
                 isDoorWasSelected = -1;
             }
+            this.Cursor = customCursor.GetCustomCursor();
+            isDoorWasSelected = 2;//окно
+            isCustomCursorSelected = true;
         }
         //При нажатии правой кнопки мыши в любом месте экрана курсор будет сброшен на дефолтный
         private void Window_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
@@ -454,7 +480,67 @@ namespace project_house
         //вход/выход из режима удаления объектов
         private void Delete_Click(object sender, RoutedEventArgs e)
         {
-
+            //удаление уже было включено => выключаем
+            if(isDeleteModeON)
+            {
+                isDeleteModeON = false;
+                //проходимся по всем элементам, расположенным на канвасе и, для каждого типа элемента,
+                //ОТПИСЫВАЕМ все ЭКЗЕМПЛЯРЫ от удаления по нажатию ЛКМ на объекте
+                //p.s так как для объектов разных классов требуются разные процедуры удаления, то
+                //и объекты нужно рассматривать как экземпляры конкретных классов, а не экземпляры
+                //их общего интерфейса
+                foreach (var item in MyCanvas.Children)
+                {
+                    if (item is FurnitureMovableUnit)
+                    {
+                        ((FurnitureMovableUnit)item).MouseLeftButtonDown -= ((FurnitureMovableUnit)item).DeleteHandler;
+                    }
+                    else if (item is CornerMovableUnit)
+                    {
+                        ((CornerMovableUnit)item).MouseLeftButtonDown -= ((CornerMovableUnit)item).DeleteHandler;
+                    }
+                    else if (item is WallUnit)
+                    {
+                        ((WallUnit)item).MouseLeftButtonDown -= ((WallUnit)item).DeleteHandler;
+                    }
+                    else if (item is ClipableToWallUnit)
+                    {
+                        ((ClipableToWallUnit)item).MouseLeftButtonDown -= ((ClipableToWallUnit)item).DeleteHandler;
+                    }
+                }
+                MessageBox.Show("Вы вышли из режима удаления.");
+            }
+            else//удаление было выключено => включаем
+            {
+                isDeleteModeON = true;
+                ResetCustomCursorToDefault();//ничего нельзя строить в этом режиме
+                isObjectCanBePlacedOnCanvas = false;
+                //проходимся по всем элементам, расположенным на канвасе и, для каждого типа элемента,
+                //подписываем все ЭКЗЕМПЛЯРЫ на удаление по нажатию ЛКМ на объекте
+                //p.s так как для объектов разных классов требуются разные процедуры удаления, то
+                //и объекты нужно рассматривать как экземпляры конкретных классов, а не экземпляры
+                //их общего интерфейса
+                foreach (var item in MyCanvas.Children)
+                {
+                    if (item is FurnitureMovableUnit)
+                    {
+                        ((FurnitureMovableUnit)item).MouseLeftButtonDown += ((FurnitureMovableUnit)item).DeleteHandler;
+                    }
+                    else if (item is CornerMovableUnit)
+                    {
+                        ((CornerMovableUnit)item).MouseLeftButtonDown += ((CornerMovableUnit)item).DeleteHandler;
+                    }
+                    else if (item is WallUnit)
+                    {
+                        ((WallUnit)item).MouseLeftButtonDown += ((WallUnit)item).DeleteHandler;
+                    }
+                    else if (item is ClipableToWallUnit)
+                    {
+                        ((ClipableToWallUnit)item).MouseLeftButtonDown += ((ClipableToWallUnit)item).DeleteHandler;
+                    }
+                }
+                MessageBox.Show("Вы вошли в режим удаления.");
+            }
         }
     }
 }
