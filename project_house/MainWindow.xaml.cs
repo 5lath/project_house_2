@@ -106,6 +106,7 @@ namespace project_house
         #endregion
         #region Установить movable на канвас
         private void SetMovableOnCanvas(string movableObjectName)
+
         {
             Point currentMousePos = Mouse.GetPosition(MyCanvas);//текущая позиция мыши => нижний левый угол объекта
             bool isCursorCrossSomething = false;
@@ -339,6 +340,9 @@ namespace project_house
                         SetMovableOnCanvas(nameOfCustomTool);
                 }
             }
+            this.Cursor = customCursor.GetCustomCursor();
+            isCustomCursorSelected = true;
+            isDoorWasSelected = 1;//дверь
         }
         #endregion
         #region Режим строительства стен
@@ -444,6 +448,9 @@ namespace project_house
                 nameOfCustomTool = "";
                 isDoorWasSelected = -1;
             }
+            this.Cursor = customCursor.GetCustomCursor();
+            isDoorWasSelected = 2;//окно
+            isCustomCursorSelected = true;
         }
         //При нажатии правой кнопки мыши в любом месте экрана курсор будет сброшен на дефолтный
         private void Window_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
