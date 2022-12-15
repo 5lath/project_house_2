@@ -50,11 +50,13 @@ namespace project_house
         CornerMovableUnit cornerUnitSelectedByWall_2;//второй угол, который будет вершиной для стены
         #endregion
         #endregion
+        #region Конструктор
         public MainWindow()
         {
             InitializeComponent();
             StartupSettingsAndParams();          
         }
+        #endregion
         #region Параметры для запуска приложения
         public void StartupSettingsAndParams()//здесь устанавливаются параметры для запуска приложения
         {
@@ -106,7 +108,6 @@ namespace project_house
         #endregion
         #region Установить movable на канвас
         private void SetMovableOnCanvas(string movableObjectName)
-
         {
             Point currentMousePos = Mouse.GetPosition(MyCanvas);//текущая позиция мыши => нижний левый угол объекта
             bool isCursorCrossSomething = false;
@@ -340,9 +341,6 @@ namespace project_house
                         SetMovableOnCanvas(nameOfCustomTool);
                 }
             }
-            this.Cursor = customCursor.GetCustomCursor();
-            isCustomCursorSelected = true;
-            isDoorWasSelected = 1;//дверь
         }
         #endregion
         #region Режим строительства стен
@@ -448,9 +446,6 @@ namespace project_house
                 nameOfCustomTool = "";
                 isDoorWasSelected = -1;
             }
-            this.Cursor = customCursor.GetCustomCursor();
-            isDoorWasSelected = 2;//окно
-            isCustomCursorSelected = true;
         }
         //При нажатии правой кнопки мыши в любом месте экрана курсор будет сброшен на дефолтный
         private void Window_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
@@ -462,7 +457,7 @@ namespace project_house
         }
 
         #endregion
-
+        #region Установка окон/дверей.
         //здесь происходит установка дверей и окон! звоните по телефону SetClipedObjectOnWall!
         private void SetClipedObjectOnWall(object sender, RoutedEventArgs e)
         {
@@ -477,6 +472,8 @@ namespace project_house
                 ResetCustomCursorToDefault();
             }
         }
+        #endregion
+        #region Режим удаления объектов
         //вход/выход из режима удаления объектов
         private void Delete_Click(object sender, RoutedEventArgs e)
         {
@@ -542,5 +539,6 @@ namespace project_house
                 MessageBox.Show("Вы вошли в режим удаления.");
             }
         }
+        #endregion
     }
 }
