@@ -49,12 +49,17 @@ namespace project_house
         CornerMovableUnit cornerUnitSelectedByWall_1;//первый угол, который будет вершиной для стены
         CornerMovableUnit cornerUnitSelectedByWall_2;//второй угол, который будет вершиной для стены
         #endregion
+        #region Object
+        //объекты, между которыми будет измеряться расстояние по нажатию кнопки Calculate
+        object objectOfCalculation1 = null;
+        object objectOfCalculation2 = null;
+        #endregion
         #endregion
         #region Конструктор
         public MainWindow()
         {
             InitializeComponent();
-            StartupSettingsAndParams();          
+            StartupSettingsAndParams();
         }
         #endregion
         #region Параметры для запуска приложения
@@ -75,6 +80,7 @@ namespace project_house
             if (nameOfCustomTool == "wall.png")
             {
                 ExitTheWallBuildingMode();
+                ExitTheCalculatingMode();
                 ResetCustomCursorToDefault();
             }
             RedrawButtonsToBuildingMode();
@@ -172,6 +178,7 @@ namespace project_house
                                                        //в любой другой режим строительства, то нужно вернуться к нормальному режиму работы приложения
                     {
                         ExitTheWallBuildingMode();
+                        ExitTheCalculatingMode();
                         ResetCustomCursorToDefault();
                     }
                     customCursor = new CornerCursor(customCursor.GetPrevCursor());
@@ -200,9 +207,9 @@ namespace project_house
         //2)меняет дефолтный курсор на курсор стены или стола
         private void btnImage2_Click(object sender, RoutedEventArgs e)
         {
-            if(isDeleteModeON)//если включен режим удаления, то мы его выключаем (см функционал Delete_Click)
+            if (isDeleteModeON)//если включен режим удаления, то мы его выключаем (см функционал Delete_Click)
             {
-                Delete_Click(sender,e);
+                Delete_Click(sender, e);
             }
 
             if (isBuildingModeOn)//режим строит-ва включен => wall
@@ -213,6 +220,7 @@ namespace project_house
                                                        //в тот же самый режим, то все равно нужно сбросить параметры старой стены
                     {
                         ExitTheWallBuildingMode();
+                        ExitTheCalculatingMode();
                         ResetCustomCursorToDefault();
                     }
                     customCursor = new WallCursor(customCursor.GetPrevCursor());
@@ -259,6 +267,7 @@ namespace project_house
                     if (nameOfCustomTool == "wall.png")
                     {
                         ExitTheWallBuildingMode();
+                        ExitTheCalculatingMode();
                         ResetCustomCursorToDefault();
                     }
                     customCursor = new DoorCursor(customCursor.GetPrevCursor());
@@ -299,6 +308,7 @@ namespace project_house
                     if (nameOfCustomTool == "wall.png")
                     {
                         ExitTheWallBuildingMode();
+                        ExitTheCalculatingMode();
                         ResetCustomCursorToDefault();
                     }
                     customCursor = new WindowCursor(customCursor.GetPrevCursor());
@@ -391,7 +401,7 @@ namespace project_house
                 if (isBothUnitWasSelected)
                 {
                     bool isWallLikeThisExist = false;
-                    foreach(var wallU in MyCanvas.Children)
+                    foreach (var wallU in MyCanvas.Children)
                     {
                         if (wallU is WallUnit)
                         {
@@ -414,6 +424,7 @@ namespace project_house
                         ((CornerMovableUnit)MyCanvas.Children[indexOfSecondCornerIncludedInThisWall]).wallsIncludesThisCornerList.Add(wall);
                     }
                     ExitTheWallBuildingMode();
+                    ExitTheCalculatingMode();
                     ResetCustomCursorToDefault();//работа закончена, можно выйти из режима строительства стен
                 }
             }
@@ -428,7 +439,7 @@ namespace project_house
             MyCanvas.MouseLeftButtonDown -= SaveThisCornerAsAPartOfWall;
             MyCanvas.MouseLeftButtonDown += MyCanvas_MouseLeftButtonDown;
             cornerUnitSelectedByWall_1 = null;
-            cornerUnitSelectedByWall_2 = null;           
+            cornerUnitSelectedByWall_2 = null;
         }
         #endregion
         #region Сброс курсора
@@ -453,6 +464,7 @@ namespace project_house
             //этот метод применяется на случай, если до нажатия ПКМ был 
             //выбран инструмент - строительство стен
             ExitTheWallBuildingMode();
+            ExitTheCalculatingMode();
             ResetCustomCursorToDefault();
         }
 
@@ -461,12 +473,12 @@ namespace project_house
         //здесь происходит установка дверей и окон! звоните по телефону SetClipedObjectOnWall!
         private void SetClipedObjectOnWall(object sender, RoutedEventArgs e)
         {
-            if(isDoorWasSelected == 1)//дверь
+            if (isDoorWasSelected == 1)//дверь
             {
                 ((WallUnit)sender).SetClipedObjectOnThisWall("door.png");
                 ResetCustomCursorToDefault();
             }
-            else if(isDoorWasSelected == 2)//окно
+            else if (isDoorWasSelected == 2)//окно
             {
                 ((WallUnit)sender).SetClipedObjectOnThisWall("window.png");
                 ResetCustomCursorToDefault();
@@ -478,7 +490,7 @@ namespace project_house
         private void Delete_Click(object sender, RoutedEventArgs e)
         {
             //удаление уже было включено => выключаем
-            if(isDeleteModeON)
+            if (isDeleteModeON)
             {
                 isDeleteModeON = false;
                 //проходимся по всем элементам, расположенным на канвасе и, для каждого типа элемента,
@@ -538,6 +550,82 @@ namespace project_house
                 }
                 MessageBox.Show("Вы вошли в режим удаления.");
             }
+        }
+        #endregion
+        #region Рассчёт расстояния между двумя объектами
+        private void SaveThisObjectAsObjectOfCalculation(object sender, MouseButtonEventArgs e)
+        {
+            if (objectOfCalculation1 == null || objectOfCalculation2 == null)
+            {
+                Point currentMousePos = Mouse.GetPosition(MyCanvas);//текущая позиция мыши => нижний левый угол объекта
+                bool isBothUnitWasSelected = false;
+
+                for (int i = 0; i < MyCanvas.Children.Count; i++)
+                {
+                    if (MyCanvas.Children[i] is FurnitureMovableUnit)
+                    {
+                        FurnitureMovableUnit movableObject = (FurnitureMovableUnit)MyCanvas.Children[i];
+                        Point pointOfCenter = (movableObject.pointOfCenter);//центр одного из объектов, уже
+                                                                            //расположенных на канвасе
+                        if (pointOfCenter.X + movableObject.halfOfObjectSize < currentMousePos.X ||
+                            pointOfCenter.X - movableObject.halfOfObjectSize > currentMousePos.X + movableObject.objectSize ||
+                            pointOfCenter.Y - movableObject.halfOfObjectSize > currentMousePos.Y ||
+                            pointOfCenter.Y + movableObject.halfOfObjectSize < currentMousePos.Y - movableObject.objectSize)
+                        {
+
+                        }
+                        else
+                        {
+                            if (objectOfCalculation1 == null)
+                            {
+                                objectOfCalculation1 = (FurnitureMovableUnit)MyCanvas.Children[i];
+                                ((FurnitureMovableUnit)objectOfCalculation1).RemoveMovementEventOnCanvas(sender, e);
+                                MessageBox.Show("Первый объект выбран.");
+                            }
+                            else if (objectOfCalculation2 == null)
+                            {
+                                objectOfCalculation2 = (FurnitureMovableUnit)MyCanvas.Children[i];
+                                ((FurnitureMovableUnit)objectOfCalculation2).RemoveMovementEventOnCanvas(sender, e);
+                                isBothUnitWasSelected = true;
+                                MessageBox.Show("Второй объект выбран.");
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                if (isBothUnitWasSelected)
+                {
+                    //рисуем пунктирную линию между центрами двух объектов
+                    //считаем длину линии
+                    //выводим длину, а затем стираем линию
+                    Polyline polyline = new Polyline();
+                    polyline.StrokeThickness = 5;
+                    polyline.Stroke = new SolidColorBrush(Colors.DarkGreen);
+                    polyline.StrokeDashArray = new DoubleCollection() { 1, 2 };
+                    polyline.Points = new PointCollection() { ((FurnitureMovableUnit)objectOfCalculation1).pointOfCenter, ((FurnitureMovableUnit)objectOfCalculation2).pointOfCenter };
+                    MyCanvas.Children.Add(polyline);
+                    double x1 = ((FurnitureMovableUnit)objectOfCalculation1).pointOfCenter.X, y1 = ((FurnitureMovableUnit)objectOfCalculation1).pointOfCenter.Y;
+                    double x2 = ((FurnitureMovableUnit)objectOfCalculation2).pointOfCenter.X, y2 = ((FurnitureMovableUnit)objectOfCalculation2).pointOfCenter.Y;
+                    double distanceBetweenObjects = Math.Sqrt(Math.Pow(x1 - x2,2) + Math.Pow(y1 - y2, 2));
+                    MessageBox.Show($"Расстояние между данными объектами = {distanceBetweenObjects}");
+                    MyCanvas.Children.Remove(polyline);
+                    ExitTheCalculatingMode();
+                }
+            }
+        }
+        private void btnCalculate_Click(object sender, RoutedEventArgs e)
+        {
+            MyCanvas.MouseLeftButtonDown += SaveThisObjectAsObjectOfCalculation;
+            MyCanvas.MouseLeftButtonDown -= MyCanvas_MouseLeftButtonDown;
+        }
+        //Принудительный выход из режима рассчёта расстояний
+        private void ExitTheCalculatingMode()
+        {
+            MyCanvas.MouseLeftButtonDown -= SaveThisObjectAsObjectOfCalculation;
+            MyCanvas.MouseLeftButtonDown += MyCanvas_MouseLeftButtonDown;
+            objectOfCalculation1 = null;
+            objectOfCalculation2 = null;
         }
         #endregion
     }

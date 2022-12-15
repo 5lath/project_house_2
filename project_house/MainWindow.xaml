@@ -172,7 +172,7 @@
                 <Image Source="resources/arrow_right.jpg" Stretch="Fill" Visibility="Visible"/>
             </Button>
             <Button Style="{StaticResource Buttons}" BorderThickness="2,2,0,0" Name="btnGroup" Content="Group" Grid.Row="0" Grid.Column="1"/>
-            <Button Style="{StaticResource Buttons}" BorderThickness="2,2,0,0" Name="btnCalculate" Content="Calculate" Grid.Row="1" Grid.Column="1"/>
+            <Button Style="{StaticResource Buttons}" BorderThickness="2,2,0,0" Name="btnCalculate" Content="Calculate" Grid.Row="1" Grid.Column="1" Click="btnCalculate_Click"/>
             <Button Style="{StaticResource Buttons}" BorderThickness="2,2,2,0" Name="Delete" Content="Delete" Grid.Column="2" Grid.RowSpan="2" Click="Delete_Click"/>
             <Border Grid.Row="2" Grid.Column="1" Style="{StaticResource Buttons}" BorderThickness="2,2,0,2">
                 <Label Name="Turn" Content="Turn" Padding="5,1,5,5" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
