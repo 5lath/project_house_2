@@ -732,6 +732,7 @@ namespace project_house
             MessageBox.Show("Выход из режима поворота объектов.");
         }
         #endregion
+
         #region Функции загрузки и сохранения проекта
         //сохраняет графику на канвасе к png формате в указанной директории
         private void btnSaveLoadProject_Click(object sender, RoutedEventArgs e)
@@ -750,5 +751,6 @@ namespace project_house
             saveFileName.Show();
         }
         #endregion
+
     }
 }
