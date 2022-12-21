@@ -389,9 +389,9 @@ namespace project_house
                         Point pointOfCenter = (movableObject.pointOfCenter);//центр одного из объектов, уже
                                                                             //расположенных на канвасе
                         if (pointOfCenter.X + movableObject.halfOfObjectSize < currentMousePos.X ||
-                            pointOfCenter.X - movableObject.halfOfObjectSize > currentMousePos.X + movableObject.objectSize ||
+                            pointOfCenter.X - movableObject.halfOfObjectSize > currentMousePos.X ||
                             pointOfCenter.Y - movableObject.halfOfObjectSize > currentMousePos.Y ||
-                            pointOfCenter.Y + movableObject.halfOfObjectSize < currentMousePos.Y - movableObject.objectSize)
+                            pointOfCenter.Y + movableObject.halfOfObjectSize < currentMousePos.Y)
                         {
 
                         }
@@ -584,9 +584,9 @@ namespace project_house
                         Point pointOfCenter = (movableObject.pointOfCenter);//центр одного из объектов, уже
                                                                             //расположенных на канвасе
                         if (pointOfCenter.X + movableObject.halfOfObjectSize < currentMousePos.X ||
-                            pointOfCenter.X - movableObject.halfOfObjectSize > currentMousePos.X + movableObject.objectSize ||
+                            pointOfCenter.X - movableObject.halfOfObjectSize > currentMousePos.X ||
                             pointOfCenter.Y - movableObject.halfOfObjectSize > currentMousePos.Y ||
-                            pointOfCenter.Y + movableObject.halfOfObjectSize < currentMousePos.Y - movableObject.objectSize)
+                            pointOfCenter.Y + movableObject.halfOfObjectSize < currentMousePos.Y)
                         {
 
                         }
@@ -679,9 +679,9 @@ namespace project_house
         private void TurnObjectHandler(object sender, MouseButtonEventArgs e)
         {
             if(isRightRotate)
-                TurnObject(/*-90*/-15, sender,e);//поворот на 15 градусов в одну сторону
+                TurnObject(/*-90*/-45, sender,e);//поворот на 45 градусов в одну сторону
             else
-                TurnObject(/*90*/15, sender,e);//поворот на 15 градусов в другую сторону
+                TurnObject(/*90*/45, sender,e);//поворот на 45 градусов в другую сторону
         }
         //если в том месте, где мы кликнули на канвас будет объект мебели, то он будет повёрнут
         private void TurnObject(double angle, object sender, MouseButtonEventArgs e)//angle - угол, на который объект будет повернут 
@@ -698,9 +698,9 @@ namespace project_house
                         Point pointOfCenter = (movableObject.pointOfCenter);//центр одного из объектов, уже
                                                                             //расположенных на канвасе
                         if (pointOfCenter.X + movableObject.halfOfObjectSize < currentMousePos.X ||
-                            pointOfCenter.X - movableObject.halfOfObjectSize > currentMousePos.X + movableObject.objectSize ||
+                            pointOfCenter.X - movableObject.halfOfObjectSize > currentMousePos.X ||
                             pointOfCenter.Y - movableObject.halfOfObjectSize > currentMousePos.Y ||
-                            pointOfCenter.Y + movableObject.halfOfObjectSize < currentMousePos.Y - movableObject.objectSize)
+                            pointOfCenter.Y + movableObject.halfOfObjectSize < currentMousePos.Y)
                         {
 
                         }
@@ -717,7 +717,7 @@ namespace project_house
                             });
                             ((FurnitureMovableUnit)MyCanvas.Children[i]).currentAngle += angle;//присваеваем получившийся в рез-е поворота угол
                             ((FurnitureMovableUnit)MyCanvas.Children[i]).RemoveMovementEventOnCanvas(sender, e);//объект будет считать, что пользователь 'взял'его, а значит нужно отменить прилипание к курсору
-                            //ExitTurningMode("Поворот сделан.");
+                            //ExitTurningMode();
                             break;
                         }
                     }
@@ -732,7 +732,6 @@ namespace project_house
             MessageBox.Show("Выход из режима поворота объектов.");
         }
         #endregion
-
         #region Функции загрузки и сохранения проекта
         //сохраняет графику на канвасе к png формате в указанной директории
         private void btnSaveLoadProject_Click(object sender, RoutedEventArgs e)
