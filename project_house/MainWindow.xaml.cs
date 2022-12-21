@@ -48,6 +48,9 @@ namespace project_house
         #region String
         string nameOfCustomTool = "";//название выбранного в данный момент инструмента. Пишется по типу toolName.png (только .png!!!)
                                      //все варианты toolName: corner, wall, door, window, chair, table, sofa, bed
+
+        public string folderName = "";
+        public string fileName = "";
         #endregion
         #region MovableUnit
         CornerMovableUnit cornerUnitSelectedByWall_1;//первый угол, который будет вершиной для стены
@@ -729,5 +732,25 @@ namespace project_house
             MessageBox.Show("Выход из режима поворота объектов.");
         }
         #endregion
+
+        #region Функции загрузки и сохранения проекта
+        //сохраняет графику на канвасе к png формате в указанной директории
+        private void btnSaveLoadProject_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Forms.FolderBrowserDialog folderDialog = new System.Windows.Forms.FolderBrowserDialog();
+
+            if (folderDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+            {
+                System.Windows.MessageBox.Show("Пользователь вышел из режима сохранения.");
+                return;
+            }
+
+            folderName = folderDialog.SelectedPath;
+
+            SaveFileNameInput saveFileName = new SaveFileNameInput(this);
+            saveFileName.Show();
+        }
+        #endregion
+
     }
 }

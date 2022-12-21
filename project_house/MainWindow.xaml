@@ -159,10 +159,10 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Button Style="{StaticResource Buttons}" BorderThickness="2,2,0,0"  Name="btnSaveLoadProject" Grid.Row="0" Grid.RowSpan="2">
+            <Button Style="{StaticResource Buttons}" BorderThickness="2,2,0,0"  Name="btnSaveLoadProject" Grid.Row="0" Grid.RowSpan="2" Click="btnSaveLoadProject_Click">
                 <TextBlock>
-                    Save/load <LineBreak/>
-                    project            
+                    Save<LineBreak/>
+                    image            
                 </TextBlock>
             </Button>
             <Button  BorderThickness="2,2,0,2" Name="btnTurnLeft"  Grid.Row="2" Click="turnLeft_Click">
