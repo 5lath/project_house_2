@@ -16,6 +16,7 @@ using System.Diagnostics;
 //наши библиотеки
 using CustomCursorLib;
 using CustomObjectsLib;
+using System.Windows.Media.Animation;
 
 namespace project_house
 {
@@ -33,6 +34,9 @@ namespace project_house
                                                  //может ставить объекты на канвасе по нажатию ЛКМ(пример: любая мебель)
         public bool isDeleteModeON = false; //включен ли режим удаления. если да, то объекты, на которых
         //юзер кликает левой кнопкой мыши будут удалены
+        bool isObjectTurning = false;//если true, то можно выбирать объект для поворота
+        bool isRightRotate = false;//true - поворот вправо, false - поворот влево
+        bool isCalculatingModeOn = false;
         #endregion
         #region Int
         int typeOfTool = -1;//1 - стул/угол, 2 - стол/стена, 3 - диван/дверь, 4 - кровать/окно. Выборы
@@ -44,10 +48,14 @@ namespace project_house
         #region String
         string nameOfCustomTool = "";//название выбранного в данный момент инструмента. Пишется по типу toolName.png (только .png!!!)
                                      //все варианты toolName: corner, wall, door, window, chair, table, sofa, bed
+
+        public string folderName = "";
+        public string fileName = "";
         #endregion
         #region MovableUnit
         CornerMovableUnit cornerUnitSelectedByWall_1;//первый угол, который будет вершиной для стены
         CornerMovableUnit cornerUnitSelectedByWall_2;//второй угол, который будет вершиной для стены
+        FurnitureMovableUnit turningObject;//объект, который будет поворачиваться в данный момент
         #endregion
         #region Object
         //объекты, между которыми будет измеряться расстояние по нажатию кнопки Calculate
@@ -73,6 +81,8 @@ namespace project_house
         {
             RedrawButtonsToFurnitureMode();
             ResetCustomCursorToDefault();
+            if (isCalculatingModeOn) ExitTheCalculatingMode();
+            if (isObjectTurning) ExitTurningMode();
             isBuildingModeOn = false;
         }
         private void GoToBuildingMode(object sender, RoutedEventArgs e)//переход в режим строительства
@@ -80,7 +90,8 @@ namespace project_house
             if (nameOfCustomTool == "wall.png")
             {
                 ExitTheWallBuildingMode();
-                ExitTheCalculatingMode();
+                if(isCalculatingModeOn)ExitTheCalculatingMode();
+                if(isObjectTurning)ExitTurningMode();
                 ResetCustomCursorToDefault();
             }
             RedrawButtonsToBuildingMode();
@@ -178,7 +189,6 @@ namespace project_house
                                                        //в любой другой режим строительства, то нужно вернуться к нормальному режиму работы приложения
                     {
                         ExitTheWallBuildingMode();
-                        ExitTheCalculatingMode();
                         ResetCustomCursorToDefault();
                     }
                     customCursor = new CornerCursor(customCursor.GetPrevCursor());
@@ -201,6 +211,8 @@ namespace project_house
                 }
                 nameOfCustomTool = "chair.png";
             }
+            if (isCalculatingModeOn) ExitTheCalculatingMode();
+            if (isObjectTurning) ExitTurningMode();
             this.Cursor = customCursor.GetCustomCursor();
             isCustomCursorSelected = true;
         }
@@ -220,7 +232,6 @@ namespace project_house
                                                        //в тот же самый режим, то все равно нужно сбросить параметры старой стены
                     {
                         ExitTheWallBuildingMode();
-                        ExitTheCalculatingMode();
                         ResetCustomCursorToDefault();
                     }
                     customCursor = new WallCursor(customCursor.GetPrevCursor());
@@ -252,6 +263,8 @@ namespace project_house
             }
             this.Cursor = customCursor.GetCustomCursor();
             isCustomCursorSelected = true;
+            if (isCalculatingModeOn) ExitTheCalculatingMode();
+            if (isObjectTurning) ExitTurningMode();
         }
         //3)меняет дефолтный курсор на курсор двери или дивана
         private void btnImage3_Click(object sender, RoutedEventArgs e)
@@ -267,7 +280,6 @@ namespace project_house
                     if (nameOfCustomTool == "wall.png")
                     {
                         ExitTheWallBuildingMode();
-                        ExitTheCalculatingMode();
                         ResetCustomCursorToDefault();
                     }
                     customCursor = new DoorCursor(customCursor.GetPrevCursor());
@@ -291,6 +303,8 @@ namespace project_house
                 nameOfCustomTool = "sofa.png";
             }
             this.Cursor = customCursor.GetCustomCursor();
+            if (isCalculatingModeOn) ExitTheCalculatingMode();
+            if (isObjectTurning) ExitTurningMode();
             isCustomCursorSelected = true;
             isDoorWasSelected = 1;//дверь
         }
@@ -308,7 +322,6 @@ namespace project_house
                     if (nameOfCustomTool == "wall.png")
                     {
                         ExitTheWallBuildingMode();
-                        ExitTheCalculatingMode();
                         ResetCustomCursorToDefault();
                     }
                     customCursor = new WindowCursor(customCursor.GetPrevCursor());
@@ -334,6 +347,8 @@ namespace project_house
             this.Cursor = customCursor.GetCustomCursor();
             isDoorWasSelected = 2;//окно
             isCustomCursorSelected = true;
+            if (isCalculatingModeOn) ExitTheCalculatingMode();
+            if (isObjectTurning) ExitTurningMode();
         }
         #endregion
         #region Применяем ВЫБРАННЫЙ юзером инструмент
@@ -424,7 +439,6 @@ namespace project_house
                         ((CornerMovableUnit)MyCanvas.Children[indexOfSecondCornerIncludedInThisWall]).wallsIncludesThisCornerList.Add(wall);
                     }
                     ExitTheWallBuildingMode();
-                    ExitTheCalculatingMode();
                     ResetCustomCursorToDefault();//работа закончена, можно выйти из режима строительства стен
                 }
             }
@@ -464,7 +478,9 @@ namespace project_house
             //этот метод применяется на случай, если до нажатия ПКМ был 
             //выбран инструмент - строительство стен
             ExitTheWallBuildingMode();
-            ExitTheCalculatingMode();
+            if(isCalculatingModeOn)ExitTheCalculatingMode();
+            if(isObjectTurning)
+            ExitTurningMode();
             ResetCustomCursorToDefault();
         }
 
@@ -626,6 +642,112 @@ namespace project_house
             MyCanvas.MouseLeftButtonDown += MyCanvas_MouseLeftButtonDown;
             objectOfCalculation1 = null;
             objectOfCalculation2 = null;
+        }
+        #endregion
+        #region Поворот мебели
+        private void turnLeft_Click(object sender, RoutedEventArgs e)
+        {
+            if (!isObjectTurning || (isObjectTurning && isRightRotate))//это значит, что включён режим правого поворота, а значит мы можем перейти на прямую в режим левого поворота
+            {
+                MessageBox.Show("Нажмите на объект, который хотите повернуть влево.");
+                isObjectTurning = true;
+                isRightRotate = false;
+                MyCanvas.MouseLeftButtonDown += TurnObjectHandler;
+                MyCanvas.MouseLeftButtonDown -= MyCanvas_MouseLeftButtonDown;
+            }
+            else
+            {
+                ExitTurningMode();
+            }
+        }
+        private void turnRight_Click(object sender, RoutedEventArgs e)
+        {
+            if (!isObjectTurning || (isObjectTurning && !isRightRotate))
+            {
+                MessageBox.Show("Нажмите на объект, который хотите повернуть вправо.");
+                isObjectTurning = true;
+                isRightRotate = true;
+                MyCanvas.MouseLeftButtonDown += TurnObjectHandler;
+                MyCanvas.MouseLeftButtonDown -= MyCanvas_MouseLeftButtonDown;
+            }
+            else
+            {
+                ExitTurningMode();
+            }
+        }
+        //обработчик для метода поворота объекта
+        private void TurnObjectHandler(object sender, MouseButtonEventArgs e)
+        {
+            if(isRightRotate)
+                TurnObject(/*-90*/-15, sender,e);//поворот на 15 градусов в одну сторону
+            else
+                TurnObject(/*90*/15, sender,e);//поворот на 15 градусов в другую сторону
+        }
+        //если в том месте, где мы кликнули на канвас будет объект мебели, то он будет повёрнут
+        private void TurnObject(double angle, object sender, MouseButtonEventArgs e)//angle - угол, на который объект будет повернут 
+        {
+            if (isObjectTurning)
+            {
+                Point currentMousePos = Mouse.GetPosition(MyCanvas);//текущая позиция мыши => нижний левый угол объекта
+
+                for (int i = 0; i < MyCanvas.Children.Count; i++)
+                {
+                    if (MyCanvas.Children[i] is FurnitureMovableUnit)
+                    {
+                        FurnitureMovableUnit movableObject = (FurnitureMovableUnit)MyCanvas.Children[i];
+                        Point pointOfCenter = (movableObject.pointOfCenter);//центр одного из объектов, уже
+                                                                            //расположенных на канвасе
+                        if (pointOfCenter.X + movableObject.halfOfObjectSize < currentMousePos.X ||
+                            pointOfCenter.X - movableObject.halfOfObjectSize > currentMousePos.X + movableObject.objectSize ||
+                            pointOfCenter.Y - movableObject.halfOfObjectSize > currentMousePos.Y ||
+                            pointOfCenter.Y + movableObject.halfOfObjectSize < currentMousePos.Y - movableObject.objectSize)
+                        {
+
+                        }
+                        else
+                        {
+                            //здесь происходит поворот 
+                            ((FurnitureMovableUnit)MyCanvas.Children[i]).RenderTransformOrigin = new Point(0.5, 0.5);
+                            ((FurnitureMovableUnit)MyCanvas.Children[i]).RenderTransform = new RotateTransform();
+                            ((FurnitureMovableUnit)MyCanvas.Children[i]).RenderTransform.BeginAnimation(RotateTransform.AngleProperty, new DoubleAnimation//маленькая анимация, которая показывает поворот объекта
+                            {
+                                From = ((FurnitureMovableUnit)MyCanvas.Children[i]).currentAngle,//текущий угол
+                                To = ((FurnitureMovableUnit)MyCanvas.Children[i]).currentAngle + angle,//текущий угол + требуемый (что бы поворот 'накапливался')
+                                Duration = TimeSpan.FromSeconds(1)
+                            });
+                            ((FurnitureMovableUnit)MyCanvas.Children[i]).currentAngle += angle;//присваеваем получившийся в рез-е поворота угол
+                            ((FurnitureMovableUnit)MyCanvas.Children[i]).RemoveMovementEventOnCanvas(sender, e);//объект будет считать, что пользователь 'взял'его, а значит нужно отменить прилипание к курсору
+                            //ExitTurningMode("Поворот сделан.");
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        private void ExitTurningMode()
+        {
+            MyCanvas.MouseLeftButtonDown -= TurnObjectHandler;
+            MyCanvas.MouseLeftButtonDown += MyCanvas_MouseLeftButtonDown;
+            isObjectTurning = false;
+            MessageBox.Show("Выход из режима поворота объектов.");
+        }
+        #endregion
+        #region Функции загрузки и сохранения проекта
+        //сохраняет графику на канвасе к png формате в указанной директории
+        private void btnSaveLoadProject_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Forms.FolderBrowserDialog folderDialog = new System.Windows.Forms.FolderBrowserDialog();
+
+            if (folderDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+            {
+                System.Windows.MessageBox.Show("Пользователь вышел из режима сохранения.");
+                return;
+            }
+
+            folderName = folderDialog.SelectedPath;
+
+            SaveFileNameInput saveFileName = new SaveFileNameInput(this);
+            saveFileName.Show();
         }
         #endregion
     }

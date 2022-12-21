@@ -35,10 +35,10 @@
             <RowDefinition Height="3*"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Border Name="MyCanvasBorder" Grid.ColumnSpan="2" Style="{StaticResource Panel_border}" Margin="0,0,5,5">
+        <Border Name="MyCanvasBorder" Grid.ColumnSpan="3" Style="{StaticResource Panel_border}" Margin="0,0,5,5">
             <Canvas Name="MyCanvas" Background="White" MouseLeftButtonDown="MyCanvas_MouseLeftButtonDown"/>
         </Border>
-        <Grid Name="Panel_object_groups" Grid.Column="2" Margin="5,0,0,5">
+        <Grid Visibility="Collapsed" Name="Panel_object_groups" Grid.Column="2" Margin="5,0,0,5">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="7*"/>
@@ -159,20 +159,20 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Button Style="{StaticResource Buttons}" BorderThickness="2,2,0,0"  Name="btnSaveLoadProject" Grid.Row="0" Grid.RowSpan="2">
+            <Button Style="{StaticResource Buttons}" BorderThickness="2,2,0,0"  Name="btnSaveLoadProject" Grid.Row="0" Grid.RowSpan="2" Click="btnSaveLoadProject_Click">
                 <TextBlock>
-                    Save/load <LineBreak/>
-                    project            
+                    Save<LineBreak/>
+                    image            
                 </TextBlock>
             </Button>
-            <Button  BorderThickness="2,2,0,2" Name="btnTurnLeft"  Grid.Row="2" >
+            <Button  BorderThickness="2,2,0,2" Name="btnTurnLeft"  Grid.Row="2" Click="turnLeft_Click">
                 <Image Source="resources/arrow_left.jpg" Stretch="Fill" Visibility="Visible"/>
             </Button>
-            <Button BorderThickness="2,2,2,2"  Name="btnTurnRight" Grid.Row="2" Grid.Column="2">
+            <Button BorderThickness="2,2,2,2"  Name="btnTurnRight" Grid.Row="2" Grid.Column="2" Click="turnRight_Click">
                 <Image Source="resources/arrow_right.jpg" Stretch="Fill" Visibility="Visible"/>
             </Button>
-            <Button Style="{StaticResource Buttons}" BorderThickness="2,2,0,0" Name="btnGroup" Content="Group" Grid.Row="0" Grid.Column="1"/>
-            <Button Style="{StaticResource Buttons}" BorderThickness="2,2,0,0" Name="btnCalculate" Content="Calculate" Grid.Row="1" Grid.Column="1" Click="btnCalculate_Click"/>
+            <Button Visibility="Collapsed" Style="{StaticResource Buttons}" BorderThickness="2,2,0,0" Name="btnGroup" Content="Group" Grid.Row="1" Grid.Column="1"/>
+            <Button Grid.RowSpan="2" Style="{StaticResource Buttons}" BorderThickness="2,2,0,0" Name="btnCalculate" Content="Calculate" Grid.Row="0" Grid.Column="1" Click="btnCalculate_Click"/>
             <Button Style="{StaticResource Buttons}" BorderThickness="2,2,2,0" Name="Delete" Content="Delete" Grid.Column="2" Grid.RowSpan="2" Click="Delete_Click"/>
             <Border Grid.Row="2" Grid.Column="1" Style="{StaticResource Buttons}" BorderThickness="2,2,0,2">
                 <Label Name="Turn" Content="Turn" Padding="5,1,5,5" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
