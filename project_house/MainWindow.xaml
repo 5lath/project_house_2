@@ -122,22 +122,22 @@
 
                         <ListBoxItem Name="furniture_item_chair" BorderThickness="0">
                             <Button x:Name="btnImage1" Background="Transparent" BorderThickness="0" Click="btnImage1_Click">
-                                <Image Name="furniture_btn_image_1" Source="resources/corner.png"/>
+                                <Image Name="furniture_btn_image_1" Source="resources/corner120.png"/>
                             </Button>
                         </ListBoxItem>
                         <ListBoxItem Name="furniture_item_table" BorderThickness="0">
                             <Button x:Name="btnImage2" Background="Transparent" BorderThickness="0" Click="btnImage2_Click">
-                                <Image Name="furniture_btn_image_2" Source="resources/wall.png"/>
+                                <Image Name="furniture_btn_image_2" Source="resources/wall120.png"/>
                             </Button>
                         </ListBoxItem>
                         <ListBoxItem Name="furniture_item_sofa" BorderThickness="0">
                             <Button x:Name="btnImage3" Background="Transparent" BorderThickness="0" Click="btnImage3_Click">
-                                <Image Name="furniture_btn_image_3" Source="resources/door.png"/>
+                                <Image Name="furniture_btn_image_3" Source="resources/door120.png"/>
                             </Button>
                         </ListBoxItem>
                         <ListBoxItem Name="furniture_item_bed" BorderThickness="0">
                             <Button x:Name="btnImage4" Background="Transparent" BorderThickness="0" Click="btnImage4_Click">
-                                <Image Name="furniture_btn_image_4" Source="resources/window.png"/>
+                                <Image Name="furniture_btn_image_4" Source="resources/window120.png"/>
                             </Button>
                         </ListBoxItem>
                     </ListBox>

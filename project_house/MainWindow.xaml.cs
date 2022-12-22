@@ -82,7 +82,7 @@ namespace project_house
             RedrawButtonsToFurnitureMode();
             ResetCustomCursorToDefault();
             if (isCalculatingModeOn) ExitTheCalculatingMode();
-            if (isObjectTurning) ExitTurningMode();
+            if (isObjectTurning) ExitTurningModeWithMessage();
             isBuildingModeOn = false;
         }
         private void GoToBuildingMode(object sender, RoutedEventArgs e)//переход в режим строительства
@@ -91,7 +91,7 @@ namespace project_house
             {
                 ExitTheWallBuildingMode();
                 if(isCalculatingModeOn)ExitTheCalculatingMode();
-                if(isObjectTurning)ExitTurningMode();
+                if(isObjectTurning)ExitTurningModeWithMessage();
                 ResetCustomCursorToDefault();
             }
             RedrawButtonsToBuildingMode();
@@ -112,10 +112,10 @@ namespace project_house
         }
         private void RedrawButtonsToBuildingMode()//перерисовка кнопок под режим расстановки мебели
         {
-            furniture_btn_image_1.Source = new BitmapImage(new Uri("pack://application:,,,/resources/corner.png"));
-            furniture_btn_image_2.Source = new BitmapImage(new Uri("pack://application:,,,/resources/wall.png"));
-            furniture_btn_image_3.Source = new BitmapImage(new Uri("pack://application:,,,/resources/door.png"));
-            furniture_btn_image_4.Source = new BitmapImage(new Uri("pack://application:,,,/resources/window.png"));
+            furniture_btn_image_1.Source = new BitmapImage(new Uri("pack://application:,,,/resources/corner120.png"));
+            furniture_btn_image_2.Source = new BitmapImage(new Uri("pack://application:,,,/resources/wall120.png"));
+            furniture_btn_image_3.Source = new BitmapImage(new Uri("pack://application:,,,/resources/door120.png"));
+            furniture_btn_image_4.Source = new BitmapImage(new Uri("pack://application:,,,/resources/window120.png"));
             furniture_objects_txt_box_1.Content = "corner";
             furniture_objects_txt_box_2.Content = "wall";
             furniture_objects_txt_box_3.Content = "door";
@@ -212,7 +212,7 @@ namespace project_house
                 nameOfCustomTool = "chair.png";
             }
             if (isCalculatingModeOn) ExitTheCalculatingMode();
-            if (isObjectTurning) ExitTurningMode();
+            if (isObjectTurning) ExitTurningModeWithMessage();
             this.Cursor = customCursor.GetCustomCursor();
             isCustomCursorSelected = true;
         }
@@ -264,7 +264,7 @@ namespace project_house
             this.Cursor = customCursor.GetCustomCursor();
             isCustomCursorSelected = true;
             if (isCalculatingModeOn) ExitTheCalculatingMode();
-            if (isObjectTurning) ExitTurningMode();
+            if (isObjectTurning) ExitTurningModeWithMessage();
         }
         //3)меняет дефолтный курсор на курсор двери или дивана
         private void btnImage3_Click(object sender, RoutedEventArgs e)
@@ -304,7 +304,7 @@ namespace project_house
             }
             this.Cursor = customCursor.GetCustomCursor();
             if (isCalculatingModeOn) ExitTheCalculatingMode();
-            if (isObjectTurning) ExitTurningMode();
+            if (isObjectTurning) ExitTurningModeWithMessage();
             isCustomCursorSelected = true;
             isDoorWasSelected = 1;//дверь
         }
@@ -348,7 +348,7 @@ namespace project_house
             isDoorWasSelected = 2;//окно
             isCustomCursorSelected = true;
             if (isCalculatingModeOn) ExitTheCalculatingMode();
-            if (isObjectTurning) ExitTurningMode();
+            if (isObjectTurning) ExitTurningModeWithMessage();
         }
         #endregion
         #region Применяем ВЫБРАННЫЙ юзером инструмент
@@ -480,7 +480,7 @@ namespace project_house
             ExitTheWallBuildingMode();
             if(isCalculatingModeOn)ExitTheCalculatingMode();
             if(isObjectTurning)
-            ExitTurningMode();
+            ExitTurningModeWithMessage();
             ResetCustomCursorToDefault();
         }
 
@@ -647,7 +647,10 @@ namespace project_house
         #region Поворот мебели
         private void turnLeft_Click(object sender, RoutedEventArgs e)
         {
-            if (!isObjectTurning || (isObjectTurning && isRightRotate))//это значит, что включён режим правого поворота, а значит мы можем перейти на прямую в режим левого поворота
+            if (isObjectTurning && isRightRotate)
+                ExitTurningMode();
+
+            if (!isObjectTurning)//это значит, что включён режим правого поворота, а значит мы можем перейти на прямую в режим левого поворота
             {
                 MessageBox.Show("Нажмите на объект, который хотите повернуть влево.");
                 isObjectTurning = true;
@@ -657,12 +660,15 @@ namespace project_house
             }
             else
             {
-                ExitTurningMode();
+                ExitTurningModeWithMessage();
             }
         }
         private void turnRight_Click(object sender, RoutedEventArgs e)
         {
-            if (!isObjectTurning || (isObjectTurning && !isRightRotate))
+            if (isObjectTurning && !isRightRotate)
+                ExitTurningMode();
+
+            if (!isObjectTurning)
             {
                 MessageBox.Show("Нажмите на объект, который хотите повернуть вправо.");
                 isObjectTurning = true;
@@ -672,16 +678,16 @@ namespace project_house
             }
             else
             {
-                ExitTurningMode();
+                ExitTurningModeWithMessage();
             }
         }
         //обработчик для метода поворота объекта
         private void TurnObjectHandler(object sender, MouseButtonEventArgs e)
         {
             if(isRightRotate)
-                TurnObject(/*-90*/-45, sender,e);//поворот на 45 градусов в одну сторону
+                TurnObject(/*-90*/-15, sender,e);//поворот на 45 градусов в одну сторону
             else
-                TurnObject(/*90*/45, sender,e);//поворот на 45 градусов в другую сторону
+                TurnObject(/*90*/15, sender,e);//поворот на 45 градусов в другую сторону
         }
         //если в том месте, где мы кликнули на канвас будет объект мебели, то он будет повёрнут
         private void TurnObject(double angle, object sender, MouseButtonEventArgs e)//angle - угол, на который объект будет повернут 
@@ -724,12 +730,16 @@ namespace project_house
                 }
             }
         }
+        private void ExitTurningModeWithMessage()
+        {
+            ExitTurningMode();
+            MessageBox.Show("Выход из режима поворота объектов.");
+        }
         private void ExitTurningMode()
         {
             MyCanvas.MouseLeftButtonDown -= TurnObjectHandler;
             MyCanvas.MouseLeftButtonDown += MyCanvas_MouseLeftButtonDown;
             isObjectTurning = false;
-            MessageBox.Show("Выход из режима поворота объектов.");
         }
         #endregion
         #region Функции загрузки и сохранения проекта
@@ -750,6 +760,5 @@ namespace project_house
             saveFileName.Show();
         }
         #endregion
-
     }
 }

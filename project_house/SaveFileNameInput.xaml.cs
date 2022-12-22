@@ -55,7 +55,7 @@ namespace project_house
         {
             RenderTargetBitmap rtb = new RenderTargetBitmap((int)canvas.RenderSize.Width, (int)canvas.RenderSize.Height, 96d, 96d, System.Windows.Media.PixelFormats.Default);
             rtb.Render(canvas);
-
+            
             var crop = new CroppedBitmap(rtb, new Int32Rect(0, 0, Convert.ToInt32(canvas.RenderSize.Width - 1), Convert.ToInt32(canvas.RenderSize.Height - 1)));
 
             BitmapEncoder pngEncoder = new PngBitmapEncoder();
