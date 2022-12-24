@@ -685,9 +685,9 @@ namespace project_house
         private void TurnObjectHandler(object sender, MouseButtonEventArgs e)
         {
             if(isRightRotate)
-                TurnObject(/*-90*/-15, sender,e);//поворот на 45 градусов в одну сторону
+                TurnObject(/*-90*/15, sender,e);//поворот на 45 градусов в одну сторону
             else
-                TurnObject(/*90*/15, sender,e);//поворот на 45 градусов в другую сторону
+                TurnObject(/*90*/-15, sender,e);//поворот на 45 градусов в другую сторону
         }
         //если в том месте, где мы кликнули на канвас будет объект мебели, то он будет повёрнут
         private void TurnObject(double angle, object sender, MouseButtonEventArgs e)//angle - угол, на который объект будет повернут 
