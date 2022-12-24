@@ -69,6 +69,7 @@ namespace project_house
         private void ThisWindowClose()
         {
             parentWindow.Show();
+            this.Close();
         }
         private void ThisWindowCloseIfParentWasClosed(object sender, System.ComponentModel.CancelEventArgs e)
         {
