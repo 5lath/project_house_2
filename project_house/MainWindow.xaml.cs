@@ -477,11 +477,15 @@ namespace project_house
         {
             //этот метод применяется на случай, если до нажатия ПКМ был 
             //выбран инструмент - строительство стен
-            ExitTheWallBuildingMode();
-            if(isCalculatingModeOn)ExitTheCalculatingMode();
-            if(isObjectTurning)
-            ExitTurningModeWithMessage();
+            ResetAllMods();
             ResetCustomCursorToDefault();
+        }
+        
+        private void ResetAllMods()
+        {
+            ExitTheWallBuildingMode();
+            if (isCalculatingModeOn) ExitTheCalculatingMode();
+            if (isObjectTurning) ExitTurningModeWithMessage();
         }
 
         #endregion
@@ -505,6 +509,7 @@ namespace project_house
         //вход/выход из режима удаления объектов
         private void Delete_Click(object sender, RoutedEventArgs e)
         {
+            ResetAllMods();
             //удаление уже было включено => выключаем
             if (isDeleteModeON)
             {
@@ -632,8 +637,21 @@ namespace project_house
         }
         private void btnCalculate_Click(object sender, RoutedEventArgs e)
         {
-            MyCanvas.MouseLeftButtonDown += SaveThisObjectAsObjectOfCalculation;
-            MyCanvas.MouseLeftButtonDown -= MyCanvas_MouseLeftButtonDown;
+            if (!isCalculatingModeOn)
+                ResetAllMods();
+
+            if (isDeleteModeON) Delete_Click(sender, e);
+
+            if (!isCalculatingModeOn)
+            {
+                MyCanvas.MouseLeftButtonDown += SaveThisObjectAsObjectOfCalculation;
+                MyCanvas.MouseLeftButtonDown -= MyCanvas_MouseLeftButtonDown;
+                isCalculatingModeOn = true;
+                MessageBox.Show("Вы вошли в режим рассчёта");
+            }
+            else
+                ExitTheCalculatingMode();
+
         }
         //Принудительный выход из режима рассчёта расстояний
         private void ExitTheCalculatingMode()
@@ -642,11 +660,18 @@ namespace project_house
             MyCanvas.MouseLeftButtonDown += MyCanvas_MouseLeftButtonDown;
             objectOfCalculation1 = null;
             objectOfCalculation2 = null;
+            isCalculatingModeOn = false;
+            MessageBox.Show("Вы вышли из режима рассчёта");
         }
         #endregion
         #region Поворот мебели
         private void turnLeft_Click(object sender, RoutedEventArgs e)
         {
+            if (!isObjectTurning)
+                ResetAllMods();
+
+            if (isDeleteModeON) Delete_Click(sender, e);
+
             if (isObjectTurning && isRightRotate)
                 ExitTurningMode();
 
@@ -665,6 +690,12 @@ namespace project_house
         }
         private void turnRight_Click(object sender, RoutedEventArgs e)
         {
+            if (!isObjectTurning)
+                ResetAllMods();
+
+            if (isDeleteModeON)//если включен режим удаления, то мы его выключаем (см функционал Delete_Click)
+                Delete_Click(sender, e);
+
             if (isObjectTurning && !isRightRotate)
                 ExitTurningMode();
 
@@ -746,6 +777,8 @@ namespace project_house
         //сохраняет графику на канвасе к png формате в указанной директории
         private void btnSaveLoadProject_Click(object sender, RoutedEventArgs e)
         {
+
+
             System.Windows.Forms.FolderBrowserDialog folderDialog = new System.Windows.Forms.FolderBrowserDialog();
 
             if (folderDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
